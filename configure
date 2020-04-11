@@ -1,0 +1,7 @@
+#!/bin/bash
+
+echo "Demo DevOps Infrastructure as Code (IaC)"
+
+function arg_parse {
+    
+}
