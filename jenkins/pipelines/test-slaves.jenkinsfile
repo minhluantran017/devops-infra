@@ -1,0 +1,31 @@
+pipeline {
+    agent none
+    stages {
+        stage('Test CentOS Slave') {
+            agent {
+                label "DOCKER_CENTOS"
+            }
+            steps {
+                script {
+                    sh  """
+                        pwd
+                        uname -a
+                    """
+                }
+            }
+        }
+        stage('Test Ubuntu Slave') {
+            agent {
+                label "DOCKER_UBUNTU"
+            }
+            steps {
+                script {
+                    sh  """
+                        pwd
+                        uname -a
+                    """
+                }
+            }
+        }
+    }
+}
