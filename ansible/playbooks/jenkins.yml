@@ -1,0 +1,8 @@
+---
+- name: Setup Jenkins
+  hosts: jenkins
+  roles:
+    - emmetog.jenkins  
+  vars_files:
+    - ../../jenkins/ansible-config/jenkins.yml
+

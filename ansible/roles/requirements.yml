@@ -1,2 +1,3 @@
+- name: emmetog.jenkins
 - name: cloudalchemy.prometheus
 - name: cloudalchemy.alertmanager

@@ -1,0 +1,219 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<hudson>
+  <disabledAdministrativeMonitors/>
+  <version>2.235.5</version>
+  <installStateName>RUNNING</installStateName>
+  <numExecutors>2</numExecutors>
+  <mode>NORMAL</mode>
+  <useSecurity>true</useSecurity>
+  <authorizationStrategy class="hudson.security.FullControlOnceLoggedInAuthorizationStrategy">
+    <denyAnonymousReadAccess>true</denyAnonymousReadAccess>
+  </authorizationStrategy>
+  <securityRealm class="hudson.security.HudsonPrivateSecurityRealm">
+    <disableSignup>true</disableSignup>
+    <enableCaptcha>false</enableCaptcha>
+  </securityRealm>
+  <disableRememberMe>false</disableRememberMe>
+  <projectNamingStrategy class="jenkins.model.ProjectNamingStrategy$DefaultProjectNamingStrategy"/>
+  <workspaceDir>${JENKINS_HOME}/workspace/${ITEM_FULL_NAME}</workspaceDir>
+  <buildsDir>${ITEM_ROOTDIR}/builds</buildsDir>
+  <jdks/>
+  <viewsTabBar class="hudson.views.DefaultViewsTabBar"/>
+  <myViewsTabBar class="hudson.views.DefaultMyViewsTabBar"/>
+  <clouds>
+    <hudson.plugins.ec2.EC2Cloud plugin="ec2@1.53">
+      <name>EC2 Agents - apse1</name>
+      <useInstanceProfileForCredentials>false</useInstanceProfileForCredentials>
+      <roleArn></roleArn>
+      <roleSessionName></roleSessionName>
+      <credentialsId>aws-api-cred</credentialsId>
+      <sshKeysCredentialsId>ec2-ssh-cred</sshKeysCredentialsId>
+      <instanceCap>2147483647</instanceCap>
+      <templates>
+        {% for agent in aws_agents %}
+        <hudson.plugins.ec2.SlaveTemplate>
+          <ami>{{ agent.ami }}</ami>
+          <description>{{ agent.name }}</description>
+          <zone></zone>
+          <securityGroups>{{ aws_agents_sg }}</securityGroups>
+          <remoteFS>/var/jenkins</remoteFS>
+          <type>{{ agent.type }}</type>
+          <ebsOptimized>false</ebsOptimized>
+          <monitoring>false</monitoring>
+          <t2Unlimited>false</t2Unlimited>
+          <labels>{{ agent.label }}</labels>
+          <mode>EXCLUSIVE</mode>
+          <initScript></initScript>
+          <tmpDir></tmpDir>
+          <userData></userData>
+          <numExecutors></numExecutors>
+          <remoteAdmin>ubuntu</remoteAdmin>
+          <jvmopts></jvmopts>
+          <subnetId>{{ aws_agents_subnet }}</subnetId>
+          <idleTerminationMinutes>30</idleTerminationMinutes>
+          <iamInstanceProfile>arn:aws:iam::{{ aws_account_id }}:instance-profile/{{ agent.instance_profile }}</iamInstanceProfile>
+          <deleteRootOnTermination>false</deleteRootOnTermination>
+          <useEphemeralDevices>false</useEphemeralDevices>
+          <customDeviceMapping></customDeviceMapping>
+          <instanceCap>10</instanceCap>
+          <minimumNumberOfInstances>0</minimumNumberOfInstances>
+          <minimumNumberOfSpareInstances>0</minimumNumberOfSpareInstances>
+          <stopOnTerminate>false</stopOnTerminate>
+          <tags>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>Name</name>
+              <value>{{ agent.name }}</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>Team</name>
+              <value>DevOps</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>Region</name>
+              <value>ap-southeast-1</value>
+            </hudson.plugins.ec2.EC2Tag>
+          </tags>
+          <connectionStrategy>PUBLIC_IP</connectionStrategy>
+          <hostKeyVerificationStrategy>CHECK_NEW_HARD</hostKeyVerificationStrategy>
+          <associatePublicIp>true</associatePublicIp>
+          <useDedicatedTenancy>false</useDedicatedTenancy>
+          <amiType class="hudson.plugins.ec2.UnixData">
+            <rootCommandPrefix>sudo</rootCommandPrefix>
+            <slaveCommandPrefix></slaveCommandPrefix>
+            <slaveCommandSuffix></slaveCommandSuffix>
+            <sshPort>22</sshPort>
+          </amiType>
+          <launchTimeout>300</launchTimeout>
+          <connectBySSHProcess>false</connectBySSHProcess>
+          <maxTotalUses>-1</maxTotalUses>
+          <nodeProperties/>
+          <nextSubnet>0</nextSubnet>
+          <usePrivateDnsName>false</usePrivateDnsName>
+          <connectUsingPublicIp>false</connectUsingPublicIp>
+        </hudson.plugins.ec2.SlaveTemplate>
+        {% endfor %}
+      </templates>
+      <region>ap-southeast-1</region>
+      <noDelayProvisioning>false</noDelayProvisioning>
+    </hudson.plugins.ec2.EC2Cloud>
+    <org.jenkinsci.plugins.vSphereCloud plugin="vsphere-cloud@2.24">
+      <name>vSphereCloud</name>
+      <vsDescription>VMware Agents</vsDescription>
+      <maxOnlineSlaves>0</maxOnlineSlaves>
+      <vsConnectionConfig>
+        <vsHost>https://{{ vcenter_domain }}</vsHost>
+        <allowUntrustedCertificate>true</allowUntrustedCertificate>
+        <credentialsId>vcenter-userpwd-cred</credentialsId>
+      </vsConnectionConfig>
+      <instanceCap>2147483647</instanceCap>
+      <templates>
+        {% for agent in vmware_agents %}
+        <org.jenkinsci.plugins.vSphereCloudSlaveTemplate>
+          <configVersion>1</configVersion>
+          <cloneNamePrefix>{{ agent.name }}</cloneNamePrefix>
+          <masterImageName>{{ agent.template }}</masterImageName>
+          <useSnapshot>false</useSnapshot>
+          <snapshotName></snapshotName>
+          <linkedClone>false</linkedClone>
+          <cluster>Main</cluster>
+          <resourcePool>Devops</resourcePool>
+          <datastore>devops-001-a</datastore>
+          <folder>Jenkins-Slaves</folder>
+          <customizationSpec></customizationSpec>
+          <templateDescription></templateDescription>
+          <templateInstanceCap>2147483647</templateInstanceCap>
+          <numberOfExecutors>1</numberOfExecutors>
+          <remoteFS>/var/jenkins</remoteFS>
+          <labelString>{{ agent.label }}</labelString>
+          <mode>EXCLUSIVE</mode>
+          <forceVMLaunch>false</forceVMLaunch>
+          <waitForVMTools>false</waitForVMTools>
+          <launchDelay>60</launchDelay>
+          <limitedRunCount>1</limitedRunCount>
+          <saveFailure>false</saveFailure>
+          <nodeProperties class="empty-list"/>
+          <guestInfoProperties class="empty-list"/>
+          <launcher class="hudson.slaves.JNLPLauncher">
+            <workDirSettings>
+              <disabled>false</disabled>
+              <internalDir>remoting</internalDir>
+              <failIfWorkDirIsMissing>false</failIfWorkDirIsMissing>
+            </workDirSettings>
+            <webSocket>false</webSocket>
+          </launcher>
+          <retentionStrategy class="org.jenkinsci.plugins.vsphere.RunOnceCloudRetentionStrategy">
+            <idleMinutes>2</idleMinutes>
+            <idleMinutes defined-in="org.jenkinsci.plugins.vsphere.RunOnceCloudRetentionStrategy">2</idleMinutes>
+          </retentionStrategy>
+        </org.jenkinsci.plugins.vSphereCloudSlaveTemplate>
+        {% endfor %}
+      </templates>
+    </org.jenkinsci.plugins.vSphereCloud>
+  </clouds>
+  <quietPeriod>5</quietPeriod>
+  <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
+  <views>
+    <hudson.model.AllView>
+      <owner class="hudson" reference="../../.."/>
+      <name>all</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+    </hudson.model.AllView>
+    <hudson.plugins.view.dashboard.Dashboard plugin="dashboard-view@2.13">
+      <owner class="hudson" reference="../../.."/>
+      <name>Admin</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+        <string>demo-springboot</string>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <recurse>false</recurse>
+      <useCssStyle>false</useCssStyle>
+      <includeStdJobList>false</includeStdJobList>
+      <hideJenkinsPanels>false</hideJenkinsPanels>
+      <leftPortletWidth>50%</leftPortletWidth>
+      <rightPortletWidth>50%</rightPortletWidth>
+      <leftPortlets/>
+      <rightPortlets/>
+      <topPortlets/>
+      <bottomPortlets/>
+    </hudson.plugins.view.dashboard.Dashboard>
+  </views>
+  <primaryView>all</primaryView>
+  <slaveAgentPort>50000</slaveAgentPort>
+  <label></label>
+  <crumbIssuer class="hudson.security.csrf.DefaultCrumbIssuer">
+    <excludeClientIPFromCrumb>false</excludeClientIPFromCrumb>
+  </crumbIssuer>
+  <nodeProperties/>
+  <globalNodeProperties>
+    <hudson.slaves.EnvironmentVariablesNodeProperty>
+      <envVars serialization="custom">
+        <unserializable-parents/>
+        <tree-map>
+          <default>
+            <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../../../../views/hudson.plugins.view.dashboard.Dashboard/jobNames/comparator"/>
+          </default>
+          <int>2</int>
+          <string>ARTIFACTORY_URL</string>
+          <string>http://{{ artifactory_domain }}:8081</string>
+          <string>REGISTRY_URL</string>
+          <string>{{ registry_domain }}</string>
+        </tree-map>
+      </envVars>
+    </hudson.slaves.EnvironmentVariablesNodeProperty>
+  </globalNodeProperties>
+</hudson>

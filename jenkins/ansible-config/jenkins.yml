@@ -1,0 +1,352 @@
+---
+jenkins_install_via: apt
+
+jenkins_version: "2.235.5"  # The exact version of jenkins to deploy
+
+jenkins_hostname: "{{ jenkins_domain }}"  # The hostname that Jenkins will be accessible on
+# The port that Jenkins will listen on for unsecured (HTTP) requests. Define to -1 to
+# disable HTTP.
+jenkins_port: "8080"
+# The port that Jenkins will listen on for secured (HTTPS) requests. Define to -1 to
+# disable HTTPS. Enabling this option requires a SSL certificate (see below).
+jenkins_port_https: "-1"
+jenkins_home: /data/jenkins  # The directory on the server where the Jenkins configs live
+jenkins_admin: "{{ admin_email }}"  # The administrator email address for the server
+
+# If you need to override any java options then do that here.
+jenkins_java_opts: "-Djenkins.install.runSetupWizard=false"
+
+# Configuration files owner and group
+jenkins_config_owner: "ubuntu"
+jenkins_config_group: "ubuntu"
+
+# The locations of the configuration files for jenkins
+jenkins_source_dir_configs: "{{ playbook_dir }}/../jenkins/ansible-config"
+jenkins_source_dir_jobs: "{{ jenkins_source_dir_configs }}/jobs"
+
+# When defined, include this task file after configuring jobs. This happens
+# at the very end of the role, but before Jenkins is taken out of quiet mode.
+jenkins_after_config_jobs_file: false
+
+# config.xml template source
+jenkins_source_config_xml: "{{ jenkins_source_dir_configs }}/config.xml"
+
+# Include custom files for jenkins installation
+jenkins_include_custom_files: true
+jenkins_custom_files:
+  - src: "config.xml.j2"
+    dest: "config.xml"
+
+  - src: "credentials.xml.j2"
+    dest: "credentials.xml"
+
+  - src: "users"
+    dest: "."
+
+# Include secrets directory during installation
+jenkins_include_secrets: false
+jenkins_source_secrets: "{{ jenkins_source_dir_configs }}/secrets/"
+
+# The names of the jobs (config.xml must exist under jenkins_source_dir_jobs/job_name/)
+jenkins_jobs: []
+
+# List of plugins to install in the Jenkins instance
+jenkins_plugins: 
+  - name: mapdb-api
+    version: "1.0.9.0"
+  - name: ssh-slaves
+    version: "1.31.2"
+  - name: cloudbees-folder
+    version: "6.14"
+  - name: bouncycastle-api
+    version: "2.18"
+  - name: resource-disposer
+    version: "0.14"
+  - name: workflow-cps-global-lib
+    version: "2.17"
+  - name: pipeline-model-definition
+    version: "1.7.2"
+  - name: gradle
+    version: "1.36"
+  - name: jquery-detached
+    version: "1.2.1"
+  - name: ssh-agent
+    version: "1.20"
+  - name: ssh-credentials
+    version: "1.18.1"
+  - name: pipeline-rest-api
+    version: "2.16"
+  - name: htmlpublisher
+    version: "1.23"
+  - name: pipeline-stage-view
+    version: "2.16"
+  - name: saml
+    version: "1.1.7"
+  - name: workflow-cps
+    version: "2.83"
+  - name: pipeline-github-lib
+    version: "1.0"
+  - name: ace-editor
+    version: "1.1"
+  - name: workflow-support
+    version: "3.5"
+  - name: jdk-tool
+    version: "1.4"
+  - name: copyartifact
+    version: "1.45.2"
+  - name: workflow-aggregator
+    version: "2.6"
+  - name: echarts-api
+    version: "4.9.0-1"
+  - name: script-security
+    version: "1.75"
+  - name: credentials
+    version: "2.3.13"
+  - name: cloud-stats
+    version: "0.25"
+  - name: workflow-job
+    version: "2.40"
+  - name: pipeline-input-step
+    version: "2.12"
+  - name: junit
+    version: "1.38"
+  - name: variant
+    version: "1.3"
+  - name: workflow-scm-step
+    version: "2.11"
+  - name: pipeline-graph-analysis
+    version: "1.10"
+  - name: xunit
+    version: "2.3.9"
+  - name: workflow-basic-steps
+    version: "2.21"
+  - name: pipeline-stage-tags-metadata
+    version: "1.7.2"
+  - name: antisamy-markup-formatter
+    version: "2.1"
+  - name: aws-java-sdk
+    version: "1.11.854"
+  - name: dashboard-view
+    version: "2.13"
+  - name: git-client
+    version: "3.5.1"
+  - name: javadoc
+    version: "1.6"
+  - name: maven-plugin
+    version: "3.7"
+  - name: pipeline-stage-step
+    version: "2.5"
+  - name: bootstrap4-api
+    version: "4.5.2-1"
+  - name: lockable-resources
+    version: "2.10"
+  - name: credentials-binding
+    version: "1.23"
+  - name: branch-api
+    version: "2.6.0"
+  - name: pipeline-model-api
+    version: "1.7.2"
+  - name: handlebars
+    version: "1.1.1"
+  - name: dtkit-api
+    version: "2.2.1"
+  - name: matrix-auth
+    version: "2.6.3"
+  - name: workflow-api
+    version: "2.40"
+  - name: pipeline-model-extensions
+    version: "1.7.2"
+  - name: influxdb
+    version: "2.4"
+  - name: jquery3-api
+    version: "3.5.1-1"
+  - name: mailer
+    version: "1.32.1"
+  - name: workflow-multibranch
+    version: "2.22"
+  - name: git-server
+    version: "1.9"
+  - name: matrix-project
+    version: "1.18"
+  - name: timestamper
+    version: "1.11.5"
+  - name: jackson2-api
+    version: "2.11.3"
+  - name: config-file-provider
+    version: "3.7.0"
+  - name: jsch
+    version: "0.1.55.2"
+  - name: atlassian-bitbucket-server-integration
+    version: "2.1.0"
+  - name: workflow-durable-task-step
+    version: "2.35"
+  - name: github-branch-source
+    version: "2.9.1"
+  - name: vsphere-cloud
+    version: "2.24"
+  - name: aws-credentials
+    version: "1.28"
+  - name: workflow-step-api
+    version: "2.22"
+  - name: email-ext
+    version: "2.77"
+  - name: parameterized-trigger
+    version: "2.39"
+  - name: okhttp-api
+    version: "3.14.9"
+  - name: momentjs
+    version: "1.1.1"
+  - name: plain-credentials
+    version: "1.7"
+  - name: display-url-api
+    version: "2.3.3"
+  - name: snakeyaml-api
+    version: "1.27.0"
+  - name: command-launcher
+    version: "1.4"
+  - name: run-condition
+    version: "1.3"
+  - name: structs
+    version: "1.20"
+  - name: node-iterator-api
+    version: "1.5.0"
+  - name: github-api
+    version: "1.116"
+  - name: ec2
+    version: "1.53"
+  - name: conditional-buildstep
+    version: "1.3.6"
+  - name: openstack-cloud
+    version: "2.55"
+  - name: github
+    version: "1.31.0"
+  - name: pam-auth
+    version: "1.6"
+  - name: ldap
+    version: "1.26"
+  - name: token-macro
+    version: "2.12"
+  - name: build-timeout
+    version: "1.20"
+  - name: throttle-concurrents
+    version: "2.0.3"
+  - name: trilead-api
+    version: "1.0.11"
+  - name: font-awesome-api
+    version: "5.14.0-1"
+  - name: popper-api
+    version: "1.16.0-6"
+  - name: apache-httpcomponents-client-4-api
+    version: "4.5.10-2.0"
+  - name: plugin-util-api
+    version: "1.3.0"
+  - name: subversion
+    version: "2.13.1"
+  - name: git
+    version: "4.4.4"
+  - name: pipeline-build-step
+    version: "2.13"
+  - name: ws-cleanup
+    version: "0.38"
+  - name: pipeline-milestone-step
+    version: "1.3.1"
+  - name: durable-task
+    version: "1.35"
+  - name: scm-api
+    version: "2.6.4"
+  - name: slack
+    version: "2.43"
+
+# How long to wait for installing plugins, in seconds. If you are seeing failures in the
+# "Wait for plugins to finish installing" task with an error message like "Timeout when
+# waiting for file <plugin_name.jpi>", you may want to increase this value.
+jenkins_plugin_timeout: 300
+
+# List of sources of custom jenkins plugins to install
+jenkins_custom_plugins: []
+
+#######################
+# Authentication vars #
+#######################
+
+# Mechanism to use when authenticating to Jenkins. Must be one of the following values:
+# - api: Use an API token which belongs to a specific user
+# - crumb: Use anonymous crumb-based authentication
+# - none: No security (not recommended)
+# For more information, please refer to the "Authentication and Security" section of the
+# README.
+jenkins_auth: "crumb"
+
+# When defined, use this API token instead of getting a crumb from the system. Requires
+# jenkins_api_username.
+#jenkins_api_token: ""
+# Username which owns the above API token.
+#jenkins_api_username: ""
+
+#########################################
+# SSL vars: apply to Jenkins HTTPS only #
+#########################################
+
+# See https://wiki.jenkins.io/display/JENKINS/Starting+and+Accessing+Jenkins for more info
+
+# Jenkins JKS keystore file. Mutually exclusive with the certificate/private key options.
+#jenkins_https_keystore: ""
+# Jenkins JKS keystore password.
+#jenkins_https_keystore_password: ""
+
+# Jenkins CA signed certificate file. Mutually exclusive with the keystore options.
+#jenkins_https_certificate: ""
+# Jenkins CA signed certificate private key.
+#jenkins_https_private_key: ""
+
+# Set to false if you are using a self-signed certificate and wish to ignore any
+# certificate verification errors from Ansible.
+#jenkins_https_validate_certs: true
+
+###################################################
+# Docker vars: apply to deploying via docker only #
+###################################################
+
+# The docker hub image name
+#jenkins_docker_image: "jenkins/jenkins"
+
+# Configs specific to the "docker" method of running jenkins
+# The name of the jenkins container
+#jenkins_docker_container_name: jenkins
+
+# Default, if true, the port will be exposed on the host (using "port")
+# If set to false, the port will only be exposed to other containers (using "expose")
+#jenkins_docker_expose_port: true
+
+
+#############################################
+# Apt vars: apply to deploying via apt only #
+#############################################
+
+# Packages which are to be installed on the jenkins instance
+jenkins_apt_packages:
+  - openjdk-8-jdk
+
+# Java version to use. Note that JDK 8 is required for Jenkins
+# 2.54 or greater.
+jenkins_java_version: "java-1.8.0-openjdk-amd64"
+
+# AWS agents configuration
+aws_agents:
+  - name: "jenkins-cloud-build-14.04"
+    ami: "ami-0aa787af8cdd260f1"
+    type: "T2Micro"
+    label: "cloud-build 14.04"
+    instance_profile: "jenkins-cloud-build-instance-profile"
+
+aws_agents_subnet: "subnet-890c88d0"
+aws_agents_sg: "default,JenkinsSlaveSG"
+
+# VMware agents configuration
+vmware_agents:
+  - name: "jenkins-onprem-build-14.04"
+    template: jenkins-onprem-build-14.04-03052020
+    label: "onprem-build 14.04"
+
+# OpenStck agent configuration
+openstack_agents: []

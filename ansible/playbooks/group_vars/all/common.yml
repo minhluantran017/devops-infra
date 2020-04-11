@@ -1,0 +1,21 @@
+# Core system
+admin_email: "devops@example.com"
+jenkins_domain: "jenkins.example.com"
+artifactory_domain: "artifactory.example.com"
+jumphost_domain: "jump.example.com"
+
+# Monitoring system
+influxdb_domain: "dashboard.example.com"
+grafana_domain: "dashboard.example.com"
+
+prometheus_domain: "metrics.example.com"
+is_alertmanager: "${IS_ALERTMANAGER}"
+slack_domain: "example.slack.com"
+
+# Supporting system
+ldap_domain: "auth.example.com"
+sec_tools_domain: "sec-tools.example.com"
+
+# Other
+vcenter_domain: "vcenter.example.com"
+registry_domain: "docker.io"
