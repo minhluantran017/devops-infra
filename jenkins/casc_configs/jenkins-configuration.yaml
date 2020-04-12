@@ -1,0 +1,305 @@
+credentials:
+  system:
+    domainCredentials:
+    - credentials:
+      - basicSSHUserPrivateKey:
+          scope: GLOBAL
+          id: "aws-ec2slave-credential"
+          username: "ec2-user"
+          passphrase: ""
+          description: "SSH Credentials for EC2 Slave"
+          privateKeySource:
+            directEntry:
+              privateKey: ${EC2_PRIVATE_KEY}
+      - usernamePassword:
+          scope: GLOBAL
+          id: "jenkins-slave1-credential"
+          username: "root"
+          password: ${JENKINS_SLAVE1_PASSWORD}
+          description: "Username/Password for Jenkins slave1 agent"
+      - aws:
+          scope: GLOBAL
+          id: "aws-devops-credential"
+          accessKey: ${AWS_DEVOPS_ACCESS_KEY}
+          secretKey: ${AWS_DEVOPS_SECRET_KEY}
+          iamRoleArn: "arn:aws:iam::123456789012:role/MyIAMRoleName"
+          description: "AWS Credentials for DevOps account"
+      - file:
+          scope: GLOBAL
+          id: "devops-privatekey-credential"
+          fileName: "devops.pem"
+          secretBytes: ${SECRET_FILE_BYTES}
+          description: "Common SSH private key"
+      - usernamePassword:
+          scope: GLOBAL
+          id: "artifactory-devops-credential"
+          username: "devops"
+          password: ${ARTIFACTORY_DEVOPS_PASSWORD
+          description: "Username/Password for Devops user on Artifactory"
+      - usernamePassword:
+          scope: GLOBAL
+          id: "github-devops-credential"
+          username: "devops"
+          password: ${GITHUB_DEVOPS_PASSWORD}
+          description: "Username/Password for Devops user on GitHub"
+      - usernamePassword:
+          scope: GLOBAL
+          id: "openstack-devops-credential"
+          username: "devops"
+          password: ${OPENSTACK_DEVOPS_PASSWORD}
+          description: "Username/Password for Devops user on OpenStack cloud"
+      - usernamePassword:
+          scope: GLOBAL
+          id: "kubernetes-devops-credential"
+          username: "devops"
+          password: ${K8S_DEVOPS_PASSWORD}
+          description: "Username/Password for Devops user on kubernetes cluster"
+
+jenkins:
+  agentProtocols:
+  - "JNLP4-connect"
+  - "Ping"
+  authorizationStrategy:
+    globalMatrix:
+      permissions:
+      - "Agent/Build:authenticated"
+      - "Agent/Configure:authenticated"
+      - "Agent/Connect:authenticated"
+      - "Agent/Create:authenticated"
+      - "Agent/Delete:authenticated"
+      - "Agent/Disconnect:authenticated"
+      - "Credentials/Create:authenticated"
+      - "Credentials/View:authenticated"
+      - "Job/Build:authenticated"
+      - "Job/Cancel:authenticated"
+      - "Job/Configure:authenticated"
+      - "Job/Create:authenticated"
+      - "Job/Delete:authenticated"
+      - "Job/Move:authenticated"
+      - "Job/Read:authenticated"
+      - "Job/Workspace:authenticated"
+      - "Overall/Administer:tmluan"
+      - "Overall/Read:authenticated"
+      - "Run/Delete:authenticated"
+      - "Run/Replay:authenticated"
+      - "Run/Update:authenticated"
+
+  clouds:
+  - docker:
+      dockerApi:
+        connectTimeout: 60
+        dockerHost:
+          uri: "tcp://jenkins-slave1.example.com:2375"
+        readTimeout: 60
+      exposeDockerHost: true
+      name: "Docker Slave Agents"
+      templates:
+      - dockerTemplateBase:
+          image: "centos-slave:7"
+        instanceCapStr: "5"
+        labelString: "DOCKER_CENTOS"
+        mode: EXCLUSIVE
+        name: "docker_centos"
+        pullStrategy: PULL_NEVER
+        pullTimeout: 300
+        remoteFs: "/mnt/jenkins"
+      - dockerTemplateBase:
+          image: "ubuntu-slave:18.04"
+        instanceCapStr: "5"
+        labelString: "DOCKER_UBUNTU"
+        name: "docker_ubuntu"
+        pullStrategy: PULL_NEVER
+        pullTimeout: 300
+        remoteFs: "/mnt/jenkins"
+
+  - amazonEC2:
+      cloudName: "AWS_EC2"
+      credentialsId: "aws-devops-credential"
+      instanceCapStr: "5"
+      privateKey: "${EC2_PRIVATE_KEY}"
+      templates:
+      - ami: "${AWS_BASE_AMI}"
+        amiType:
+          unixData:
+            rootCommandPrefix: "sudo"
+            sshPort: "22"
+        associatePublicIp: false
+        connectBySSHProcess: false
+        connectionStrategy: PRIVATE_IP
+        deleteRootOnTermination: false
+        description: "AWS_EC2"
+        ebsOptimized: false
+        idleTerminationMinutes: "30"
+        labelString: "AWS_EC2"
+        maxTotalUses: -1
+        minimumNumberOfInstances: 0
+        minimumNumberOfSpareInstances: 0
+        mode: EXCLUSIVE
+        monitoring: false
+        numExecutors: 1
+        remoteAdmin: "ec2-user"
+        remoteFS: "/home/ec2-user"
+        securityGroups: "sg-123456"
+        stopOnTerminate: false
+        t2Unlimited: false
+        type: T2Large
+        useDedicatedTenancy: false
+        useEphemeralDevices: false
+        zone: "us-east-1a"
+      useInstanceProfileForCredentials: false
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: false
+  disableRememberMe: false
+  globalNodeProperties:
+  - envVars:
+      env:
+      - key: "AWS_DEFAULT_PROFILE"
+        value: "devops"
+      - key: "AWS_DEFAULT_REGION"
+        value: "us-east-1"
+  markupFormatter: "plainText"
+  mode: NORMAL
+  myViewsTabBar: "standard"
+  nodes:
+  - permanent:
+      labelString: "DOCKER_MACHINE"
+      launcher:
+        ssh:
+          credentialsId: "jenkins-slave1-credential"
+          host: "jenkins-slave1.example.com"
+          port: 22
+          sshHostKeyVerificationStrategy:
+            manuallyTrustedKeyVerificationStrategy:
+              requireInitialManualTrust: false
+      name: "docker-machine"
+      nodeDescription: "Jenkins Slave 1 Docker agent"
+      numExecutors: 5
+      remoteFS: "/root"
+      retentionStrategy: "always"
+  numExecutors: 2
+  primaryView:
+    all:
+      name: "all"
+  projectNamingStrategy: "standard"
+  proxy:
+    name: "10.10.10.10"
+    port: 8080
+    secretPassword: "{AQAAABAAAAAQkoqT3jNpRd2TZ9px6QQIeNUMZwxIZoX6NLr1TsCF49c=}"
+  quietPeriod: 5
+  remotingSecurity:
+    enabled: true
+  scmCheckoutRetryCount: 0
+  securityRealm:
+    ldap:
+      configurations:
+      - displayNameAttributeName: "cn"
+        groupSearchBase: "ou=groups"
+        groupSearchFilter: "cn=DevOps"
+        ignoreIfUnavailable: true
+        inhibitInferRootDN: false
+        managerDN: "cn=admin,dc=example,dc=com"
+        managerPasswordSecret: "{AQAAABAAAAAQj9nmjhF5QRfxzg3eLSIT9UWCSXxhZvmpsm/VDDftXDM=}"
+        rootDN: "dc=example,dc=com"
+        server: "auth.example.com"
+        userSearchBase: "ou=people"
+      disableMailAddressResolver: false
+      disableRolePrefixing: true
+      groupIdStrategy: "caseInsensitive"
+      userIdStrategy: "caseInsensitive"
+  slaveAgentPort: -1
+  updateCenter:
+    sites:
+    - id: "default"
+      url: "https://updates.jenkins.io/update-center.json"
+  views:
+  - all:
+      name: "all"
+  viewsTabBar: "standard"
+security:
+  apiToken:
+    creationOfLegacyTokenEnabled: false
+    tokenGenerationOnCreationEnabled: false
+    usageStatisticsEnabled: true
+  globalJobDslSecurityConfiguration:
+    useScriptSecurity: true
+  sSHD:
+    port: -1
+unclassified:
+  artifactoryBuilder:
+    artifactoryServers: 
+      - serverId: artifactory
+        artifactoryUrl: http://artifactory.example.com:8081/artifactory
+        resolverCredentialsConfig:
+          username: devops
+          password: ${ARTIFACTORY_DEVOPS_PASSWORD}
+    useCredentialsPlugin: false
+  buildDiscarders:
+    configuredBuildDiscarders:
+    - "jobBuildDiscarder"
+  defaultFolderConfiguration:
+    healthMetrics:
+    - worstChildHealthMetric:
+        recursive: true
+  influxDbGlobalConfig:
+    targets:
+    - database: "jenkins_data"
+      description: "metrics.example.com"
+      exposeExceptions: true
+      globalListener: true
+      jobScheduledTimeAsPointsTimestamp: false
+      password: "{AQAAABAAAAAQsmiw0YsGoYuxdwy2IC8wlG9HbcnzDWR8ZIw01JDzKoY=}"
+      retentionPolicy: "autogen"
+      url: "http://metrics.example.com:8086"
+      usingJenkinsProxy: false
+  ivyBuildTrigger:
+    extendedVersionMatching: false
+  location:
+    adminAddress: "devops-admin@example.com"
+    url: "http://jenkins.example.com:8080/"
+  mailer:
+    charset: "UTF-8"
+    useSsl: false
+  mavenModuleSet:
+    localRepository: "default"
+  pollSCM:
+    pollingThreadCount: 10
+  prometheusConfiguration:
+    collectingMetricsPeriodInSeconds: 120
+    countAbortedBuilds: true
+    countFailedBuilds: true
+    countNotBuiltBuilds: true
+    countSuccessfulBuilds: true
+    countUnstableBuilds: true
+    defaultNamespace: "default"
+    fetchTestResults: true
+    jobAttributeName: "jenkins_job"
+    path: "prometheus"
+    processingDisabledBuilds: false
+    useAuthenticatedEndpoint: false
+tool:
+  git:
+    installations:
+    - home: "git"
+      name: "Default"
+
+jobs:
+  - script: >
+      folder('Admin')
+  - script: >
+      job("Admin/seed-job") {
+        steps {
+          dsl {
+            text(readFileFromWorkspace('jenkins/dsl/seed-job.gvy'))
+          }
+        }
+      }
+  - script: >
+      pipelineJob('Admin/test-slaves') {
+        definition {
+          cps {
+            script(readFileFromWorkspace('jenkins/pipelines/test-slaves.jenkinsfile'))
+            sandbox()
+          }
+        }
+      }
