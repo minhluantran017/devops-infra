@@ -2,16 +2,25 @@
 
 ## What is this?
 
-The purpose of this repo is to create a basic DevOps environment for practice.
+The purpose of this repo is to practise DevOps Infrastructure as Code (IaC).
+
+List of components that will be handled in this repo: 
+* Jenkins
+* JFrog artifactory
+* LDAP server
+* InfluxDB
+* Prometheus
+* Grafana
+* Elastic Stack
 
 ## Prerequisites
 
-- You should have a bunch of Virtual Machines for this demo.
-Here I use KVM and OpenStack for hosting.
-
+- You should have a bunch of Virtual Machines for this demo, for example KVM, OpenStack, Amazon EC2.
 - Optionally, you should have an active Amazon Web Service account (free-tier eligible).
 
 ## Usage
+
+WORKING IN-PROGRESS
 
 ```sh
 # Configure the variables before setting up
@@ -20,7 +29,7 @@ Here I use KVM and OpenStack for hosting.
 # Code validation
 make validate
 
-# Setup the virtual machines
+# Setup the requirements
 make setup
 
 # Deploy the environment
@@ -42,16 +51,14 @@ For example: `dev_luan_jenkins`.
 - Specify each component's configuration files/code under its directory.
 And Ansible playbooks/ inventories under `ansible` directory.
 
-- Please always create Pull Request to merge it to `master`.
-
-- If you see any issue with code in `master` branch, just create an [issue](https://github.com/minhluantran017/devops-infra/issues/new/) with title: `[component] Issue ABC bla bla`
+- Please always create Pull Request to merge it to `master`. Only merge if all the tests pass.
 
 ## Licenses
 
-See licenses
+See [licenses](licences)
 
 ## Contributing
 
 Please read above *Code of Conduct* before contributing.
 
-See list of contributors [here](contributing).
+See list of contributors [here](contributing.md).
