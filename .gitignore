@@ -1,2 +1,6 @@
 temp/
-terraform/*/.terraform
+*/.*
+**/*.tfstate*
+**/*.tar.gz
+**/*.tar
+**/*.zip
