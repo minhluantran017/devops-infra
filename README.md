@@ -26,12 +26,6 @@ WORKING IN-PROGRESS
 # Configure the variables before setting up
 ./configure
 
-# Code validation
-make validate
-
-# Setup the requirements
-make setup
-
 # Deploy the environment
 make deploy
 

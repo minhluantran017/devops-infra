@@ -1,0 +1,35 @@
+name: Validate Terraform plans
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: Install Terraform
+        run: |
+          sudo apt-get install unzip -y
+          TERRAFORM_VER=`curl -sS https://releases.hashicorp.com/terraform/ | grep href | head -2 | tail -1 | awk -F/ '{print $3}'`
+          curl -o $HOME/terraform.zip https://releases.hashicorp.com/terraform/${TERRAFORM_VER}/terraform_${TERRAFORM_VER}_linux_amd64.zip
+          unzip $HOME/terraform.zip -d $HOME
+          
+      - name: Validate plans
+        run: |
+          cd terraform
+          ls | while read file
+          do
+            if [[ -d $file ]]; then
+              $HOME/terraform validate "$file"
+            fi
+          done
+      
+          

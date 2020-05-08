@@ -1,43 +1,21 @@
-TERRAFORM_DIR := terraform
-PLAYBOOK_DIR := ansible
+SCRIPT_DIR := scripts
 
-all: validate setup deploy test
+all: deploy test
 
-terraform_validate:
-	cd $(TERRAFORM_DIR) && terraform validate
-
-terraform_init:
-	cd $(TERRAFORM_DIR) && terraform init
-
-terraform_apply:
-	cd $(TERRAFORM_DIR) && terraform apply
-
-terraform_destroy:
-	cd $(TERRAFORM_DIR) && terraform destroy
-
-ansible_validate:
-	cd $(PLAYBOOK_DIR) && ansible-playbook --syntax-check playbook.yml
-
-ansible_deploy:
-	cd $(PLAYBOOK_DIR) && ansible-playbook -v playbook.yml
-
-post_config:
-	echo "TBD"
+deploy_env:
+	cd $(SCRIPT_DIR) && ./deploy_env.sh
 
 test_env:
-	echo "TBD"
+	cd $(SCRIPT_DIR) && ./test_env.sh
 
-.PHONY: validate
-validate: terraform_validate ansible_validate
-
-.PHONY: setup
-setup: terraform_apply
+destroy_env:
+	cd $(SCRIPT_DIR) && ./destroy_env.sh
 
 .PHONY: deploy
-deploy: ansible_deploy post_config
+deploy: deploy_env
 
 .PHONY: test
 test: test_env
 
 .PHONY: destroy
-destroy: terraform_destroy
+destroy: destroy_env
