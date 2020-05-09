@@ -13,23 +13,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-      - name: Install Terraform
-        run: |
-          sudo apt-get install unzip -y
-          TERRAFORM_VER=`curl -sS https://releases.hashicorp.com/terraform/ | grep href | head -2 | tail -1 | awk -F/ '{print $3}'`
-          curl -o $HOME/terraform.zip https://releases.hashicorp.com/terraform/${TERRAFORM_VER}/terraform_${TERRAFORM_VER}_linux_amd64.zip
-          unzip $HOME/terraform.zip -d $HOME
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
           
-      - name: Validate plans
+      - name: Check syntax
         run: |
-          cd terraform
-          ls | while read file
+          ls terraform/| while read file
           do
             if [[ -d $file ]]; then
-              $HOME/terraform validate "$file"
+              terraform fmt -check "$file"
             fi
           done
-      
-          

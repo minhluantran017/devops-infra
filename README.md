@@ -1,5 +1,7 @@
 # Demo DevOps Infrastructure as Code (IaC)
 
+![](https://github.com/minhluantran017/devops-infra/workflows/Validate%20Terraform%20plans/badge.svg)
+
 ## What is this?
 
 The purpose of this repo is to practise DevOps Infrastructure as Code (IaC).
