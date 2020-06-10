@@ -5,3 +5,4 @@ terraform/*/.terraform
 **/*.tar.gz
 **/*.tar
 **/*.zip
+terraform/*/*.tfstate*
