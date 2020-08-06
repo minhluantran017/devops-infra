@@ -1,17 +1,16 @@
-job("Admin/seed-job") {
+job("Admin/job-seeder") {
     label('master')
     description('Automatically create Jenkins job from DSL script or Jenkinsfile')
     parameters {
         stringParam('JOB_NAME', '', 'Job name to create')
-        stringParam('GIT_REPO', 'ssh://git@github.com/minhluantran017/stuffs.git', 'Git repository to use')
         stringParam('GIT_BRANCH', 'master', 'Git branch to use')
         choiceParam('TYPE', ['JOB', 'PIPELINE'], 'Job type')
-        stringParam('DSL_JENKINS_FILE', '', 'Groovy DSL script or Jenkinsfile path')
+        stringParam('DSL_JENKINS_FILE', '', 'Groovy DSL script or Jenkinsfile path inside "jenkins" folder')
     }
     scm {
         git {
             remote {
-                url('\${GIT_REPO}')
+                url('ssh://git@github.com/minhluantran017/devops-infra.git')
                 branch('\${GIT_BRANCH}')
                 credentials('github-devops-credential')
             }
@@ -38,7 +37,7 @@ job("Admin/seed-job") {
             runner('Fail')
             steps {
                 dsl {
-                    external('\${DSL_JENKINS_FILE}')
+                    external('jenkins/jobs/\${DSL_JENKINS_FILE}')
                 }
             }
         }
@@ -59,11 +58,11 @@ pipelineJob("\${JOB_NAME}") {
                     remote {
                         branch('\${GIT_BRANCH}')
                         credentials('github-devops-credential')
-                        url('\${GIT_REPO}')
+                        url('ssh://git@github.com/minhluantran017/devops-infra.git')
                     }
                 }
             }
-            scriptPath("\${DSL_JENKINS_FILE}")
+            scriptPath("jenkins/jobs/\${DSL_JENKINS_FILE}")
         }
     }
 }
