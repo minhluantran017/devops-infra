@@ -1,0 +1,9 @@
+---
+- name: Setup Prometheus
+  hosts: prometheus
+  roles:
+    - cloudalchemy.prometheus
+    - cloudalchemy.alertmanager
+  vars_files:
+    - ../../prometheus/config/prometheus.yml
+    - ../../prometheus/config/alertmanager.yml
