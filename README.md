@@ -41,11 +41,13 @@ make destroy
 
 ## Code of Conduct
 
-- Create branch for each component from `master` with convention: `dev_<yourname>_<component>`.
-For example: `dev_luan_jenkins`.
+- Create branch for each component from `master` with convention: `<yourname>_<component>`.
+For example: `luan_jenkins`.
 
-- Specify each component's configuration files/code under its directory.
-And Ansible playbooks/ inventories under `ansible` directory.
+- Place each component's configuration files/code under its own directory. Read its own `README.md` for more information.
+- Place Terraform plans under `terraform` directory. Read [README](terraform/README.md) for more information.
+- Place Ansible playbooks under `ansible` directory. Read [README](ansible/README.md) for more information.
+- Place common scripts under `scripts` directory.
 
 - Please always create Pull Request to merge it to `master`. Only merge if all the tests pass.
 

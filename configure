@@ -2,6 +2,23 @@
 
 echo "Demo DevOps Infrastructure as Code (IaC)"
 
-function arg_parse {
-    
+TOP_DIR=$(git rev-parse --show-toplevel)
+source ${TOP_DIR}/scripts/utils.sh
+
+function get_platform() {
+    local platform="$1"
+    case "$platform" in
+        aws|AWS)    do_work export INFRA_PLATFORM="AWS" ;;
+        kvm|KVM)    do_work export INFRA_PLATFORM="KVM" ;;
+        *)          error "Platform not supported: $platform"
+    esac
 }
+
+read -e -p "Choose platform to continue [aws, kvm]: " input && get_platform ${input}
+
+echo "Choose component to deploy:"
+read -e -p "+ Jenkins [true, false]: " -i "true" input && export JENKINS_ENABLED=${input}
+read -e -p "+ Artifactory [true, false]: " -i "true" input && export ARTIFACTORY_ENABLED=${input}
+read -e -p "+ InfluxDB [true, false]: " -i "true" input && export INFLUXDB_ENABLED=${input}
+read -e -p "+ Grafana [true, false]: " -i "true" input && export GRAFANA_ENABLED=${input}
+read -e -p "+ Prometheus [true, false]: " -i "true" input && export PROMETHEUS_ENABLED=${input}

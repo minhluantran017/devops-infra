@@ -1,0 +1,33 @@
+name: "Validate syntax"
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  validate:
+    name: Validate syntax
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 0.12.29
+          
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Check Terraform syntax
+        run: |
+          terraform fmt -check terraform/aws
+        continue-on-error: true
+
+      - name: Lint Ansible Playbook
+        uses: ansible/ansible-lint-action@master
+        with:
+          targets: |
+            ansible/playbooks/prometheus.yml
+        continue-on-error: true
