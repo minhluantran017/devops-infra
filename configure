@@ -1,24 +1,42 @@
 #!/bin/bash
 
-echo "Demo DevOps Infrastructure as Code (IaC)"
-
 TOP_DIR=$(git rev-parse --show-toplevel)
 source ${TOP_DIR}/scripts/utils.sh
 
+info "Demo DevOps Infrastructure as Code (IaC)"
+
+
+[[ -e "${TOP_DIR}/temp/environment" ]] && rm -rf ${TOP_DIR}/temp/environment
+
+function write_env() {
+   echo $1 >> ${TOP_DIR}/temp/environment
+}
 function get_platform() {
-    local platform="$1"
-    case "$platform" in
-        aws|AWS)    do_work export INFRA_PLATFORM="AWS" ;;
-        kvm|KVM)    do_work export INFRA_PLATFORM="KVM" ;;
-        *)          error "Platform not supported: $platform"
-    esac
+   local platform="$1"
+   case "$platform" in
+      aws|AWS)    write_env INFRA_PLATFORM="AWS" ;;
+      kvm|KVM)    write_env INFRA_PLATFORM="KVM" ;;
+      *)          error "Platform not supported: $platform"
+   esac
 }
 
-read -e -p "Choose platform to continue [aws, kvm]: " input && get_platform ${input}
+read -e -p "# What is your project name?: " input && write_env PROJECT_NAME=${input}
 
-echo "Choose component to deploy:"
-read -e -p "+ Jenkins [true, false]: " -i "true" input && export JENKINS_ENABLED=${input}
-read -e -p "+ Artifactory [true, false]: " -i "true" input && export ARTIFACTORY_ENABLED=${input}
-read -e -p "+ InfluxDB [true, false]: " -i "true" input && export INFLUXDB_ENABLED=${input}
-read -e -p "+ Grafana [true, false]: " -i "true" input && export GRAFANA_ENABLED=${input}
-read -e -p "+ Prometheus [true, false]: " -i "true" input && export PROMETHEUS_ENABLED=${input}
+read -e -p "# Choose platform to continue [aws, kvm]: " -i "aws" input && get_platform ${input}
+
+if [[ ${INFRA_PLATFORM} != "AWS" ]]; then
+   read -e -p "## Type AWS region: " -i "us-east-1" input && write_env AWS_REGION=${input}
+   read -e -p "## Deploy AWS wrapper? [true, false]: " -i "true" input && write_env AWS_WRAPPER_ENABLED=${input}
+   [[ ${AWS_WRAPPER_ENABLED} == "true" ]] && read -e -p "### AWS Free tier eligible? [true, false]: " -i "true" input && \
+      write_env AWS_FREE_ENABLED=${input}
+fi
+
+info "# Choose component to deploy:"
+read -e -p "## Jenkins [true, false]: " -i "true" input && write_env JENKINS_ENABLED=${input}
+read -e -p "## Artifactory [true, false]: " -i "true" input && write_env ARTIFACTORY_ENABLED=${input}
+read -e -p "## InfluxDB [true, false]: " -i "true" input && write_env INFLUXDB_ENABLED=${input}
+read -e -p "## Grafana [true, false]: " -i "true" input && write_env GRAFANA_ENABLED=${input}
+read -e -p "## Prometheus [true, false]: " -i "true" input && write_env PROMETHEUS_ENABLED=${input}
+read -e -p "## Elastic Stack [true, false]: " -i "true" input && write_env ELK_ENABLED=${input}
+read -e -p "## LDAP [true, false]: " -i "true" input && write_env PROMETHEUS_ENABLED=${input}
+read -e -p "## Security tools [true, false]: " -i "true" input && write_env SEC_TOOLS_ENABLED=${input}
