@@ -1,8 +1,16 @@
-# Grafana Helm Chart
+# Grafana
 
-* Installs the web dashboarding system [Grafana](http://grafana.org/)
+This contains Grafana configuration files.
 
-## Installing the Chart
+Learn more about Grafana: http://grafana.org/
+
+## 1. Install using Ansible role:
+TBD
+
+## 2. Install using Docker image:
+TBD
+
+## 3. Install using Helm chart:
 
 Add Grafana Helm repository:
 ```console
@@ -10,14 +18,10 @@ helm repo add grafana https://grafana.github.io/helm-charts
 helm repo update
 ```
 
-Customize your deployment in [values.yaml]:
+Customize your deployment in `values.yaml`:
 ```console
-vi values.yaml
+vi grafana/helm/values.yaml
 ```
-
-- Section `ingress`: to integrate with your ingress controller.
-I'm using `ingress-nginx` with a configured DNS record.
-- Section `grafana.ini`: to define your Grafana system configuration.
 
 Install the chart with custom `values.yaml`:
 ```console
@@ -34,10 +38,7 @@ Now login to your Grafana with user `admin` and above password. In my case is:
 http://k8s.mrmarsu.tk:30080/grafana/
 ```
 
-## Uninstalling the Chart
-
 To uninstall deployment:
-
 ```console
 helm uninstall my-grafana
 ```
