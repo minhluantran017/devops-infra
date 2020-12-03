@@ -103,6 +103,7 @@ jenkins:
         pullStrategy: PULL_NEVER
         pullTimeout: 300
         remoteFs: "/mnt/jenkins"
+
       - dockerTemplateBase:
           image: "ubuntu-slave:18.04"
         instanceCapStr: "5"
